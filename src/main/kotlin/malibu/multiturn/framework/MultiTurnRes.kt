@@ -1,7 +1,5 @@
 package malibu.multiturn.framework
 
-import malibu.multiturn.framework.Directive
-
 data class MultiTurnRes(
     val requestId: String,
     val intent: String,
@@ -11,6 +9,7 @@ data class MultiTurnRes(
     val modelVersion: Int,
     val topic: String? = null,
     val topicState: String? = null,
+    val intendTrace: IntendTrace? = null,
 ) {
     private val conversationParams: MutableMap<String, Any> = mutableMapOf()
     private val requestParams: MutableMap<String, Any> = mutableMapOf()
@@ -24,4 +23,15 @@ data class MultiTurnRes(
     fun getDirectives(): List<Directive> {
         return directives.toList()
     }
+}
+
+data class IntendTrace(
+    var req: MultiTurnReq,
+    var intend: String,
+    var isFallback: Boolean,
+    var task: String,
+    val executedActions: MutableList<String>,
+    val appliedListeners: MutableList<String>,
+
+) {
 }
