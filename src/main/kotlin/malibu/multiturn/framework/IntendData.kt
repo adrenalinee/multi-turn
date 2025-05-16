@@ -5,9 +5,8 @@ import kotlin.reflect.KClass
 class IntendData(
     val multiTurnReq: MultiTurnReq,
     val behaviorRegistry: BehaviorRegistry,
-    private val arguments: MutableMap<String, Any?>,
 ) {
-//    private val arguments: MutableMap<String, Any?> = mutableMapOf()
+    private val arguments: MutableMap<String, Any?> = mutableMapOf()
 
     /**
      * argument 로딩이 끝났는지 여부.

@@ -9,12 +9,12 @@ data class MultiTurnRes(
     val modelVersion: Int,
     val topic: String? = null,
     val topicState: String? = null,
-    val intendTrace: IntendTrace? = null,
 ) {
     private val conversationParams: MutableMap<String, Any> = mutableMapOf()
     private val requestParams: MutableMap<String, Any> = mutableMapOf()
     private val directives: MutableList<Directive> = mutableListOf()
 
+    var intendTrace: IntendTrace? = null
 
     fun addDirective(directive: Directive) {
         directives.add(directive)
@@ -26,12 +26,12 @@ data class MultiTurnRes(
 }
 
 data class IntendTrace(
-    var req: MultiTurnReq,
-    var intend: String,
-    var isFallback: Boolean,
-    var task: String,
-    val executedActions: MutableList<String>,
-    val appliedListeners: MutableList<String>,
+//    var req: MultiTurnReq,
+    var isFallback: Boolean? = null,
+    var intend: String? = null,
+    var task: String? = null,
+    val executedActions: List<String>,
+    val appliedListeners: List<String>,
 
 ) {
 }

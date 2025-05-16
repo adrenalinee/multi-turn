@@ -1,11 +1,7 @@
 package malibu.multiturn.framework
 
 import malibu.multiturn.framework.exception.*
-import malibu.multiturn.model.Argument
-import malibu.multiturn.model.BotScenario
-import malibu.multiturn.model.Intend
-import malibu.multiturn.model.NameValue
-import malibu.multiturn.model.Task
+import malibu.multiturn.model.*
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
@@ -27,25 +23,15 @@ class MultiTurnHandler(
             logger.debug { "handle: $multiTurnReq" }
         }
 
-        if (multiTurnReq.botScenario != null && multiTurnReq.botScenario != botScenario.name) {
-            return Mono.error { RuntimeException("처리할 수 있는 요청이 아닙니다. ${botScenario.name} 만 처리할 수 있습니다. request botScenario: ${multiTurnReq.botScenario}") }
-        }
+        val executeTrace = ExecuteTrace(multiTurnReq)
+        val (topic, topicState) = findTopicState(multiTurnReq)
 
-        val topicName = multiTurnReq.topic?: botScenario.spec.defaultTopicName
-            ?: return Mono.error(RuntimeException("default topic not found."))
-        val topic = botScenario.spec.getTopic(topicName)
-            ?: return Mono.error(RuntimeException("topic not found. topicName: $topicName"))
+        executeTrace.selectedTopic = topic
+        executeTrace.selectedTopicState = topicState
 
-        val topicStateName = multiTurnReq.topicState?: topic.defaultStateName
-            ?: return Mono.error(RuntimeException("default stateName not found."))
-        val topicState = topic.getState(topicStateName)
-            ?: return Mono.error(RuntimeException("state not found. stateName: $topicStateName"))
-
-        val argumentValueMap = mutableMapOf<String, Any?>()
         val intendData = IntendData(
             multiTurnReq = multiTurnReq,
             behaviorRegistry = behaviorRegistry,
-            arguments = argumentValueMap,
         )
 
         return topicState.findHeadIntendByIntentName(multiTurnReq.intent)
@@ -57,7 +43,7 @@ class MultiTurnHandler(
                 )
             }
             .switchIfEmpty {
-                topicState.findHeadIntendByIntentName(multiTurnReq.intent)
+                topicState.findFallbackIntendByIntentName(multiTurnReq.intent)
                     .toMono()
                     .switchIfEmpty {
                         findIntendByTriggerExpression(
@@ -68,34 +54,51 @@ class MultiTurnHandler(
             }
             .switchIfEmpty { Mono.error(IntendNotSelectedException(topicState)) }
             .flatMap { selectedIntend ->
+                executeTrace.selectedIntend = selectedIntend
                 findTask(selectedIntend, intendData)
                     .switchIfEmpty { Mono.error(TaskNotSelectedException(selectedIntend)) }
-            }
-            .flatMap { selectedTask ->
-                val multiTurnRes = MultiTurnRes(
-                    requestId =  multiTurnReq.requestId,
-                    conversationId = multiTurnReq.conversationId,
-                    intent = multiTurnReq.intent,
-                    botScenario = botScenario.name,
-                    topic = topicName,
-                    topicState = topicStateName,
-                    scenarioVersion = botScenario.scenarioVersion,
-                    modelVersion = botScenario.modelVersion,
-                )
+                    .flatMap { selectedTask ->
+                        executeTrace.selectedTask = selectedTask
+                        val multiTurnRes = MultiTurnRes(
+                            requestId = multiTurnReq.requestId,
+                            conversationId = multiTurnReq.conversationId,
+                            intent = multiTurnReq.intent,
+                            botScenario = botScenario.name,
+                            topic = topic.name,
+                            topicState = topicState.name,
+                            scenarioVersion = botScenario.scenarioVersion,
+                            modelVersion = botScenario.modelVersion,
+                        )
 
-                executeActions(multiTurnRes, selectedTask, intendData)
-            }.map { taskResult ->
-                IntendResult(
-                    selectedTask = taskResult.selectedTask,
-                    executableActions = taskResult.executableActions,
-                    multiTurnRes = taskResult.multiTurnRes,
-                    appliedIntendListeners = emptyList()
-                )
-            }.switchIfEmpty {
-                Mono.error(RuntimeException("intentResult 가 생성되지 않았습니다."))
-            }.map { intendResult ->
-                intendResult.multiTurnRes
+//                        executeTrace.multiTurnRes = multiTurnRes
+                        executeActions(multiTurnRes, selectedTask, intendData)
+                            .map { executedActions ->
+                                executeTrace.executedActions = executedActions
+
+                                multiTurnRes.intendTrace = executeTrace.toIntendTrace()
+                                multiTurnRes
+                            }
+                    }
             }
+            .switchIfEmpty { Mono.error(RuntimeException("intentResult 가 생성되지 않았습니다.")) }
+    }
+
+    private fun findTopicState(multiTurnReq: MultiTurnReq): Pair<Topic, TopicState> {
+        if (multiTurnReq.botScenario != null && multiTurnReq.botScenario != botScenario.name) {
+            throw RuntimeException("처리할 수 있는 요청이 아닙니다. ${botScenario.name} 만 처리할 수 있습니다. request botScenario: ${multiTurnReq.botScenario}")
+        }
+
+        val topicName = multiTurnReq.topic?: botScenario.spec.defaultTopicName
+        ?: throw RuntimeException("default topic not found.")
+        val topic = botScenario.spec.getTopic(topicName)
+            ?: throw RuntimeException("topic not found. topicName: $topicName")
+
+        val topicStateName = multiTurnReq.topicState?: topic.defaultStateName
+        ?: throw RuntimeException("default stateName not found.")
+        val topicState = topic.getState(topicStateName)
+            ?: throw RuntimeException("state not found. stateName: $topicStateName")
+
+        return Pair(topic, topicState)
     }
 
     private fun findIntendByTriggerExpression(intends: List<Intend>, intendData: IntendData): Mono<Intend> {
@@ -137,14 +140,14 @@ class MultiTurnHandler(
                     }
                 }.thenReturn(intendData.evaluate(task.triggerExpression, Boolean::class) ?: false)
             }
-            .singleOrEmpty()
+            .singleOrEmpty() //TODO 여러개 찾아질 경우에???
     }
 
     private fun executeActions(
         multiTurnRes: MultiTurnRes,
         selectedTask: Task,
         intendData: IntendData,
-    ): Mono<TaskResult> {
+    ): Mono<List<Action>> {
         val executableActions = selectedTask.getActions().filter { action ->
             val enabled = action.enabledPredicate?.let { enabledPredicate ->
                 intendData.evaluate(enabledPredicate, Boolean::class)
@@ -167,7 +170,8 @@ class MultiTurnHandler(
                 actionBehavior.behave(action, intendData, multiTurnRes)
                     .onErrorMap { ex -> ActionBehaviorRunException(actionBehavior, ex) }
             }
-            .then(TaskResult(selectedTask, executableActions, multiTurnRes).toMono())
+            .then(executableActions.toMono())
+//            .then(TaskResult(selectedTask, executableActions, multiTurnRes).toMono())
     }
 
     private fun loadArgument(arguments: List<NameValue<Argument>>, intendData: IntendData): Mono<Void> {

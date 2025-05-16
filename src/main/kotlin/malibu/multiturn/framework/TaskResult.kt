@@ -6,5 +6,4 @@ import malibu.multiturn.model.Task
 data class TaskResult(
     val selectedTask: Task,
     val executableActions: List<Action>,
-    val multiTurnRes: MultiTurnRes
 )
