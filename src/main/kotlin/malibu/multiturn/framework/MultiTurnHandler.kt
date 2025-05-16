@@ -66,6 +66,7 @@ class MultiTurnHandler(
                         )
                     }
             }
+            .switchIfEmpty { Mono.error(IntendNotSelectedException(topicState)) }
             .flatMap { selectedIntend ->
                 findTask(selectedIntend, intendData)
                     .switchIfEmpty { Mono.error(TaskNotSelectedException(selectedIntend)) }
