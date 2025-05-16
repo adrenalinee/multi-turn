@@ -1,0 +1,27 @@
+package malibu.multiturn.framework
+
+import malibu.multiturn.framework.Directive
+
+data class MultiTurnRes(
+    val requestId: String,
+    val intent: String,
+    val conversationId: String?,
+    val botScenario: String,
+    val scenarioVersion: String,
+    val modelVersion: Int,
+    val topic: String? = null,
+    val topicState: String? = null,
+) {
+    private val conversationParams: MutableMap<String, Any> = mutableMapOf()
+    private val requestParams: MutableMap<String, Any> = mutableMapOf()
+    private val directives: MutableList<Directive> = mutableListOf()
+
+
+    fun addDirective(directive: Directive) {
+        directives.add(directive)
+    }
+
+    fun getDirectives(): List<Directive> {
+        return directives.toList()
+    }
+}
