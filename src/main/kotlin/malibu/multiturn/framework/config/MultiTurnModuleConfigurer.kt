@@ -3,6 +3,7 @@ package malibu.multiturn.framework.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.NamedType
 import malibu.multiturn.framework.*
+import malibu.multiturn.framework.expression.ExpressionParser
 import malibu.multiturn.model.Action
 import malibu.multiturn.model.Argument
 import malibu.multiturn.model.BotScenarioSpec

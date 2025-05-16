@@ -1,5 +1,6 @@
 package malibu.multiturn.framework
 
+import malibu.multiturn.framework.config.MultiTurnConfiguration
 import malibu.multiturn.framework.exception.*
 import malibu.multiturn.model.*
 import mu.KotlinLogging
@@ -70,7 +71,6 @@ class MultiTurnHandler(
                             modelVersion = botScenario.modelVersion,
                         )
 
-//                        executeTrace.multiTurnRes = multiTurnRes
                         executeActions(multiTurnRes, selectedTask, intendData)
                             .map { executedActions ->
                                 executeTrace.executedActions = executedActions
@@ -171,7 +171,6 @@ class MultiTurnHandler(
                     .onErrorMap { ex -> ActionBehaviorRunException(actionBehavior, ex) }
             }
             .then(executableActions.toMono())
-//            .then(TaskResult(selectedTask, executableActions, multiTurnRes).toMono())
     }
 
     private fun loadArgument(arguments: List<NameValue<Argument>>, intendData: IntendData): Mono<Void> {
@@ -197,6 +196,5 @@ class MultiTurnHandler(
             .doOnNext { (argumentName, argumentValue) -> intendData.putArgument(argumentName, argumentValue)}
             .doOnComplete { intendData.finishIntendArgumentLoad = true }
             .then()
-//            .collectMap()
     }
 }

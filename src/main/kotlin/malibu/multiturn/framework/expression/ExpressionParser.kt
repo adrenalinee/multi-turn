@@ -1,6 +1,5 @@
-package malibu.multiturn.framework
+package malibu.multiturn.framework.expression
 
-import malibu.multiturn.framework.ExpressionRoot
 import kotlin.reflect.KClass
 
 /**

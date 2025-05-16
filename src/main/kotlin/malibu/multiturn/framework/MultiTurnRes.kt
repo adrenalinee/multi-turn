@@ -1,5 +1,7 @@
 package malibu.multiturn.framework
 
+import malibu.multiturn.model.Directive
+
 data class MultiTurnRes(
     val requestId: String,
     val intent: String,

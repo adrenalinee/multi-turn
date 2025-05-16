@@ -26,6 +26,4 @@ class SpeakActionBehavior(
 
         return Mono.empty()
     }
-
-
 }

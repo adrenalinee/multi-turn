@@ -1,19 +1,20 @@
-package malibu.multiturn.framework
+package malibu.multiturn.framework.config
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.jsontype.NamedType
-import malibu.multiturn.framework.config.MappingFunction
-import malibu.multiturn.framework.config.MultiTurnModuleConfigurer
+import malibu.multiturn.framework.BehaviorRegistry
 import malibu.multiturn.framework.exception.MultiTurnModuleConfigurerNotFoundException
+import malibu.multiturn.framework.expression.ExpressionParser
 import malibu.multiturn.framework.expression.SpelParser
 import malibu.multiturn.model.BotScenario
 import malibu.multiturn.model.MultiTurnModule
 import malibu.multiturn.module.core.CoreModule
 import malibu.multiturn.module.core.CoreModuleConfiguration
 import mu.KotlinLogging
+import kotlin.collections.plus
 import kotlin.reflect.KClass
 
 class MultiTurnConfiguration(
@@ -43,7 +44,7 @@ class MultiTurnConfiguration(
         }
 
     init {
-        registerModule(CoreModule.TYPE, CoreModuleConfiguration())//기본 모듈 추가.
+        registerModule(CoreModule.Companion.TYPE, CoreModuleConfiguration())//기본 모듈 추가.
     }
 
     fun initialize(om: ObjectMapper) {

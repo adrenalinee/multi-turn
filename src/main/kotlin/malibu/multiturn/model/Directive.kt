@@ -1,4 +1,4 @@
-package malibu.multiturn.framework
+package malibu.multiturn.model
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonTypeInfo

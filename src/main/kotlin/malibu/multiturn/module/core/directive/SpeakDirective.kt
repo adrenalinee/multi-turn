@@ -1,6 +1,6 @@
 package malibu.multiturn.module.core.directive
 
-import malibu.multiturn.framework.Directive
+import malibu.multiturn.model.Directive
 
 class SpeakDirective(
     val sentences: List<String>

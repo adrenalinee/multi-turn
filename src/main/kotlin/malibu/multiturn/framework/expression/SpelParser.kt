@@ -1,7 +1,5 @@
 package malibu.multiturn.framework.expression
 
-import malibu.multiturn.framework.ExpressionParser
-import malibu.multiturn.framework.ExpressionRoot
 import malibu.multiturn.framework.exception.SpelEvaluationMultiTurnException
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.DataBindingMethodResolver

@@ -2,6 +2,7 @@ package malibu.multiturn.framework
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import malibu.multiturn.TestBotScenarios
+import malibu.multiturn.framework.config.MultiTurnConfiguration
 import org.junit.jupiter.api.Test
 import java.util.*
 

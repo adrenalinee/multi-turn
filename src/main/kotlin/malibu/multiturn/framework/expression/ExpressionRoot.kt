@@ -1,4 +1,6 @@
-package malibu.multiturn.framework
+package malibu.multiturn.framework.expression
+
+import malibu.multiturn.framework.MultiTurnReq
 
 /**
  * 표현식의 root 로 사용할 객체.

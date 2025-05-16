@@ -1,5 +1,6 @@
 package malibu.multiturn.framework
 
+import malibu.multiturn.framework.expression.ExpressionRoot
 import kotlin.reflect.KClass
 
 class IntendData(
@@ -41,7 +42,8 @@ class IntendData(
         temporaryVariables: Map<String, Any> = emptyMap()
     ): T? {
         if (!::expressionRoot.isInitialized) { // 요청당 최초 evaluate 호출되었을때 생성한 값을 계속 사용하기 위해 이렇게 처리.
-            expressionRoot = ExpressionRoot( //표현식에서 현재 attributes, arguments 와 daReq 에 접근가능
+            expressionRoot = ExpressionRoot(
+                //표현식에서 현재 attributes, arguments 와 daReq 에 접근가능
                 req = multiTurnReq,
                 args = arguments,
             )
