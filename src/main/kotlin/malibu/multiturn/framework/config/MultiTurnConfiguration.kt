@@ -74,7 +74,6 @@ class MultiTurnConfiguration(
             }
         }
 
-
         isInit = true
     }
 

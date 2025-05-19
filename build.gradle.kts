@@ -19,6 +19,7 @@ dependencies {
 
     api("org.springframework:spring-expression")
 
+    api("org.apache.commons:commons-text:1.13.1")
     api("io.github.microutils:kotlin-logging:3.0.5")
 
     testImplementation(kotlin("test"))

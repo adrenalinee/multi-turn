@@ -11,4 +11,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonPropertyOrder(*["type"])
 abstract class Directive(
     val type: String,
-)
+) {
+    var description: String? = null
+}

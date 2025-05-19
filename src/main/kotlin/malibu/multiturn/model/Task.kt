@@ -16,7 +16,31 @@ data class Task(
      *
      * 기본값은 false.
      */
-    var triggerRequireArguments: Boolean? = null
+    var triggerRequireArguments: Boolean? = null,
+
+    /**
+     * 다음 요청의 scenario
+     * 지정하지 않으면 현재 scenario 가 계속된다.
+     */
+    val nextTopic: String? = null,
+
+    /**
+     * 다음 요청의 state
+     * 지정하지 않으면 현재 state 가 계속된다.
+     */
+    val nextTopicState: String? = null,
+
+    /**
+     * next scenario 를 null 로 하고 싶으면 true
+     * 기본적으로는 현재 값이 유지된다.
+     */
+    val nextTopicUnset: Boolean? = null,
+
+    /**
+     * next state 를 null 로 하고 싶으면 true
+     * 기본적으로는 현재 값이 유지된다.
+     */
+    val nextTopicStateUnset: Boolean? = null,
 ) {
     private val arguments: MutableList<NameValue<Argument>> = mutableListOf()
 

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonPropertyOrder(*["type"])
 abstract class Action(
-    val type: String
+    val type: String,
 ) {
     /**
      * 액션이 실제 동작할지를 여부를 표현식으로 확인한다.

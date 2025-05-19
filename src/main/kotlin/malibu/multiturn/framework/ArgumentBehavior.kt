@@ -7,7 +7,7 @@ abstract class ArgumentBehavior<T: Argument> {
     fun behave(
         argument: Argument,
         intendData: IntendData,
-    ): Mono<Any> {
+    ): Mono<out Any> {
         @Suppress("UNCHECKED_CAST")
         return retrieve(argument as T, intendData)
     }
@@ -18,5 +18,5 @@ abstract class ArgumentBehavior<T: Argument> {
     protected abstract fun retrieve(
         argument: T,
         intendData: IntendData,
-    ): Mono<Any>
+    ): Mono<out Any>
 }

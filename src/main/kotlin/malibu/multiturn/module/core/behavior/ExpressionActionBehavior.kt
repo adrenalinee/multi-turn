@@ -3,17 +3,17 @@ package malibu.multiturn.module.core.behavior
 import malibu.multiturn.framework.ActionBehavior
 import malibu.multiturn.framework.IntendData
 import malibu.multiturn.framework.MultiTurnRes
-import malibu.multiturn.module.core.SpeakAction
-import malibu.multiturn.module.core.directive.SpeakDirective
+import malibu.multiturn.module.core.ExpressionAction
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
 
-class SpeakActionBehavior(
-): ActionBehavior<SpeakAction>(){
+class ExpressionActionBehavior(
+
+): ActionBehavior<ExpressionAction>() {
     private val logger = KotlinLogging.logger {  }
 
     override fun run(
-        action: SpeakAction,
+        action: ExpressionAction,
         intendData: IntendData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
@@ -21,11 +21,12 @@ class SpeakActionBehavior(
             logger.debug { "start" }
         }
 
-        multiTurnRes.addDirective(SpeakDirective(
-            sentences = action.sentences.map { sentence ->
-                intendData.resolvePlaceHolder(sentence)
-            }
-        ))
+        action.expressions.forEach { expression ->
+            intendData.evaluate(
+                expression = expression,
+                desiredResultType = Any::class
+            )
+        }
 
         return Mono.empty()
     }

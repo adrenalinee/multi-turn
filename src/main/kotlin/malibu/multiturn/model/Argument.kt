@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonPropertyOrder(*["type"])
 abstract class Argument(
-    val type: String
+    val type: String,
 ) {
     var required: Boolean? = null
 

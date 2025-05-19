@@ -56,4 +56,13 @@ class IntendData(
             temporaryVariables = temporaryVariables
         )
     }
+
+    /**
+     *
+     */
+    fun resolvePlaceHolder(rawValue: String): String {
+        return PlaceholderResolver.resolve(rawValue) { expression ->
+            evaluate(expression, String::class)?: ""
+        }
+    }
 }

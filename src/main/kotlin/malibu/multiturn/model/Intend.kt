@@ -16,7 +16,7 @@ data class Intend(
      *
      * 기본값은 false.
      */
-    var triggerRequireArguments: Boolean? = null
+    var triggerRequireArguments: Boolean? = null,
 ) {
     private val intentNames: MutableList<String> = mutableListOf()
     private val arguments: MutableList<NameValue<Argument>> = mutableListOf()

@@ -10,5 +10,5 @@ data class MultiTurnReq(
     val topic: String? = null,
     val topicState: String? = null,
     val conversationParams: Map<String, Any> = emptyMap(),
-    val requestParams: Map<String, Any> = emptyMap(),
+    val instantParams: Map<String, Any> = emptyMap(),
 )

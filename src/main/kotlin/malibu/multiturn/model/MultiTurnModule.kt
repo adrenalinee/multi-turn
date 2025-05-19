@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonPropertyOrder(*["type"])
 abstract class MultiTurnModule(
-    val type: String
+    val type: String,
 ) {
     var description: String? = null
 }
