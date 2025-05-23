@@ -35,13 +35,17 @@ object TestBotScenarios {
                                         Param(name = "simple-text-param", value = "simple-text"),
                                         Param(name = "expression-param", value = "1 + 2 = {{1 + 2}}")
                                     )
-                                ))
+                                ).apply {
+                                    description = "conversationParam 은 같은 conversationId 를 가진 request 들에서 유지되어야 합니다. 명시적으로 지우지 않는 이상 response 에도 포함되어야 합니다."
+                                })
                                 addAction(AddInstantParamAction(
                                     params = listOf(
                                         Param(name = "simple-text-param", value = "simple-text"),
                                         Param(name = "expression-param", value = "intent={{req.intent}}"),
                                     )
-                                ))
+                                ).apply {
+                                    description = "instantParam 은 1회용으로, response 에서 없어져야 함."
+                                })
                             })
                         })
                     })
