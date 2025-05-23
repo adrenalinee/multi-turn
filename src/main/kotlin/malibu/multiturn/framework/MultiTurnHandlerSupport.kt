@@ -19,20 +19,46 @@ class MultiTurnHandlerSupport(
 
     internal fun createMultiTurnRes(
         multiTurnReq: MultiTurnReq,
-        topic: Topic,
-        topicState: TopicState,
+//        topic: Topic,
+//        topicState: TopicState,
     ): MultiTurnRes {
         return MultiTurnRes(
             requestId = multiTurnReq.requestId,
             conversationId = multiTurnReq.conversationId,
             intent = multiTurnReq.intent,
             botScenario = botScenario.name,
-            topic = topic.name,
-            topicState = topicState.name,
+//            topic = topic.name,
+//            topicState = topicState.name,
             scenarioVersion = botScenario.scenarioVersion,
             modelVersion = botScenario.modelVersion,
         ).also { multiTurnRes ->
             multiTurnRes.setAllConversationParams(multiTurnReq.conversationParams)
+        }
+    }
+
+    internal fun postTasksRun(
+        intendData: IntendData,
+        selectedTask: Task,
+        multiTurnRes: MultiTurnRes,
+    ) {
+        if (selectedTask.nextTopicStateUnset == true) {
+            multiTurnRes.nextTopic = null
+        } else {
+            selectedTask.nextTopic
+                ?.also { nextTopicName -> multiTurnRes.nextTopic = nextTopicName }
+                ?: run {
+                    multiTurnRes.nextTopic = intendData.topic.name
+                }
+        }
+
+        if (selectedTask.nextTopicStateUnset == true) {
+            multiTurnRes.nextTopicState = null
+        } else {
+            selectedTask.nextTopicState
+                ?.also { nextTopicStateName -> multiTurnRes.nextTopicState = nextTopicStateName }
+                ?: run {
+                    multiTurnRes.nextTopicState = intendData.topicState.name
+                }
         }
     }
 

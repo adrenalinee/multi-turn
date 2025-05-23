@@ -14,20 +14,4 @@ class ExpressionRoot(
     val req: MultiTurnReq,
 
     val args: Map<String, Any?>,
-
-//    /**
-//     * permanentContext 에 들어 있던 params
-//     */
-//    val permanentParams: Map<String, Any>,
-//
-//    /**
-//     * instantContext 에 들어 있던 params
-//     */
-//    val instantParams: Map<String, Any>,
-
-//    /**
-//     * behavior 끼리만 공유할 수 있는 데이터.
-//     * 하나의 요청안에서만 유지된다.
-//     */
-//    val attributes: Map<String, Any?>
 )

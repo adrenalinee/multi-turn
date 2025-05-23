@@ -10,8 +10,6 @@ data class MultiTurnRes(
     val botScenario: String,
     val scenarioVersion: String,
     val modelVersion: Int,
-    val topic: String? = null,
-    val topicState: String? = null,
 ) {
 
     @JsonProperty
@@ -21,6 +19,10 @@ data class MultiTurnRes(
     private val instantParams: MutableMap<String, Any> = mutableMapOf()
 
     private val directives: MutableList<Directive> = mutableListOf()
+
+    var nextTopic: String? = null
+
+    var nextTopicState: String? = null
 
     var trace: IntendTrace? = null
 
@@ -56,6 +58,10 @@ data class MultiTurnRes(
     }
 
     fun getInstantParam(name: String): Any? = instantParams[name]
+
+    fun setAllInstantParams(params: Map<String, Any>) {
+        instantParams.putAll(params)
+    }
 }
 
 data class IntendTrace(

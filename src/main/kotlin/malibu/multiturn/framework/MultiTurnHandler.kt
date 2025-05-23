@@ -39,6 +39,9 @@ class MultiTurnHandler(
         val intendData = IntendData(
             multiTurnReq = multiTurnReq,
             behaviorRegistry = behaviorRegistry,
+            botScenario = botScenario,
+            topic = topic,
+            topicState = topicState,
         )
 
         return topicState.findHeadIntendByIntentName(multiTurnReq.intent)
@@ -61,6 +64,7 @@ class MultiTurnHandler(
             }
             .switchIfEmpty { Mono.error(IntendNotSelectedException(topicState)) }
             .flatMap { selectedIntend ->
+                intendData.intend = selectedIntend
                 executeTrace.selectedIntend = selectedIntend
 
                 val toApplyIntendListeners = riseBeforeTaskSelect(
@@ -73,17 +77,25 @@ class MultiTurnHandler(
                     .switchIfEmpty { Mono.error(TaskNotSelectedException(selectedIntend)) }
                     .flatMap { selectedTask ->
                         executeTrace.selectedTask = selectedTask
-                        val multiTurnRes = support.createMultiTurnRes(multiTurnReq, topic, topicState)
+                        val multiTurnRes = support.createMultiTurnRes(multiTurnReq/*, topic, topicState*/)
 
                         support.executeActions(multiTurnRes, selectedTask, intendData)
                             .flatMap { executeActions ->
-                                riseAfterTaskRun(toApplyIntendListeners, intendData).thenReturn(executeActions)
+                                riseAfterTaskRun(toApplyIntendListeners, intendData, selectedTask, multiTurnRes)
+                                    .thenReturn(executeActions)
                             }
                             .map { executedActions ->
                                 executeTrace.executedActions = executedActions
 
                                 multiTurnRes.trace = executeTrace.toIntendTrace()
                                 multiTurnRes
+                            }
+                            .doOnNext { multiTurnRes ->
+                                support.postTasksRun(intendData, selectedTask, multiTurnRes)
+                            }
+                            .flatMap { multiTurnRes ->
+                                riseAfterTasksRunCompletion(toApplyIntendListeners, intendData, selectedTask, multiTurnRes)
+                                    .thenReturn(multiTurnRes)
                             }
                     }
             }
@@ -126,12 +138,27 @@ class MultiTurnHandler(
     private fun riseAfterTaskRun(
         toApplyIntentListeners: Flux<IntendListener>,
         intendData: IntendData,
-//        taskResult: TaskResult
+        selectedTask: Task,
+        multiTurnRes: MultiTurnRes,
     ): Mono<List<Unit>> {
         return toApplyIntentListeners.collectList()
             .flatMapIterable { it.reversed() }
             .flatMap { intendListener ->
-                intendListener.afterTasksRun(intendData/*, taskResult*/)
+                intendListener.afterTasksRun(intendData, selectedTask, multiTurnRes)
+                    .onErrorMap { ex -> AfterTasksRunException(intendListener, ex) }
+            }.collectList()
+    }
+
+    private fun riseAfterTasksRunCompletion(
+        toApplyIntentListeners: Flux<IntendListener>,
+        intendData: IntendData,
+        selectedTask: Task,
+        multiTurnRes: MultiTurnRes,
+    ): Mono<List<Unit>> {
+        return toApplyIntentListeners.collectList()
+            .flatMapIterable { it.reversed() }
+            .flatMap { intendListener ->
+                intendListener.afterTasksRunCompletion(intendData, selectedTask, multiTurnRes)
                     .onErrorMap { ex -> AfterTasksRunException(intendListener, ex) }
             }.collectList()
     }

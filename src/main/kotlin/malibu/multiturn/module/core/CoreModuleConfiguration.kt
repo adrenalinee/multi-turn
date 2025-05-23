@@ -9,6 +9,7 @@ import malibu.multiturn.module.core.behavior.ExpressionActionBehavior
 import malibu.multiturn.module.core.behavior.ExpressionArgumentBehavior
 import malibu.multiturn.module.core.behavior.RemoveConversationParamActionBehavior
 import malibu.multiturn.module.core.behavior.SpeakActionBehavior
+import malibu.multiturn.module.core.behavior.TransferInstantParamActionBehavior
 
 class CoreModuleConfiguration: MultiTurnModuleConfigurer<CoreModule>() {
     override fun initialize() {
@@ -17,6 +18,7 @@ class CoreModuleConfiguration: MultiTurnModuleConfigurer<CoreModule>() {
         register(AddConversationParamAction.TYPE, AddConversationParamActionBehavior())
         register(AddInstantParamAction.TYPE, AddInstantParamActionBehavior())
         register(RemoveConversationParamAction.TYPE, RemoveConversationParamActionBehavior())
+        register(TransferInstantParamAction.TYPE, TransferInstantParamActionBehavior())
 
         register(ExpressionArgument.TYPE, ExpressionArgumentBehavior())
     }

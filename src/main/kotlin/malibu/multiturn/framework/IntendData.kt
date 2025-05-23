@@ -1,11 +1,18 @@
 package malibu.multiturn.framework
 
 import malibu.multiturn.framework.expression.ExpressionRoot
+import malibu.multiturn.model.BotScenario
+import malibu.multiturn.model.Intend
+import malibu.multiturn.model.Topic
+import malibu.multiturn.model.TopicState
 import kotlin.reflect.KClass
 
 class IntendData(
     val multiTurnReq: MultiTurnReq,
     val behaviorRegistry: BehaviorRegistry,
+    val botScenario: BotScenario,
+    val topic: Topic,
+    val topicState: TopicState,
 ) {
     private val arguments: MutableMap<String, Any?> = mutableMapOf()
 
@@ -14,6 +21,8 @@ class IntendData(
      */
     var finishIntendArgumentLoad: Boolean = false
         internal set
+
+    internal lateinit var intend: Intend
 
     /**
      * 표현식에서 사용할 root object.

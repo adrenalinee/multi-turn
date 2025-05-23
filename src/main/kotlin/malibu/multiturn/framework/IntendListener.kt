@@ -1,5 +1,6 @@
 package malibu.multiturn.framework
 
+import malibu.multiturn.model.Task
 import reactor.core.publisher.Mono
 
 interface IntendListener {
@@ -19,12 +20,12 @@ interface IntendListener {
     /**
      * task run 실행 직후
      */
-    fun afterTasksRun(intendData: IntendData/*, taskResult: TaskResult*/): Mono<Unit> = Mono.empty()
+    fun afterTasksRun(intendData: IntendData, selectedTask: Task, multiTurnRes: MultiTurnRes): Mono<Unit> = Mono.empty()
 
     /**
      * task 후 IntendData 처리까지 끝난 후에 실행
      */
-    fun afterTasksRunCompletion(intendData: IntendData/*, taskResult: TaskResult*/): Mono<Unit> = Mono.empty()
+    fun afterTasksRunCompletion(intendData: IntendData, selectedTask: Task, multiTurnRes: MultiTurnRes): Mono<Unit> = Mono.empty()
 
     /**
      * task 실행중에 에러가 발생했을때 실생됨
