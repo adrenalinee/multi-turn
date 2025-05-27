@@ -1,9 +1,8 @@
 package malibu.multiturn.module.core.behavior
 
 import malibu.multiturn.framework.ActionBehavior
-import malibu.multiturn.framework.IntendData
+import malibu.multiturn.framework.RequestData
 import malibu.multiturn.framework.MultiTurnRes
-import malibu.multiturn.module.core.AddConversationParamAction
 import malibu.multiturn.module.core.RemoveConversationParamAction
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
@@ -15,7 +14,7 @@ class RemoveConversationParamActionBehavior(
 
     override fun run(
         action: RemoveConversationParamAction,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
         if (logger.isDebugEnabled) {

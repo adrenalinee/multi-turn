@@ -6,10 +6,10 @@ import reactor.core.publisher.Mono
 abstract class ArgumentBehavior<T: Argument> {
     fun behave(
         argument: Argument,
-        intendData: IntendData,
+        requestData: RequestData,
     ): Mono<out Any> {
         @Suppress("UNCHECKED_CAST")
-        return retrieve(argument as T, intendData)
+        return retrieve(argument as T, requestData)
     }
 
     /**
@@ -17,6 +17,6 @@ abstract class ArgumentBehavior<T: Argument> {
      */
     protected abstract fun retrieve(
         argument: T,
-        intendData: IntendData,
+        requestData: RequestData,
     ): Mono<out Any>
 }

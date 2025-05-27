@@ -24,7 +24,7 @@ data class MultiTurnRes(
 
     var nextTopicState: String? = null
 
-    var trace: IntendTrace? = null
+    var trace: RequestTrace? = null
 
     fun addDirective(directive: Directive) {
         directives.add(directive)
@@ -63,12 +63,3 @@ data class MultiTurnRes(
         instantParams.putAll(params)
     }
 }
-
-data class IntendTrace(
-    var isFallback: Boolean? = null,
-    var intend: String? = null,
-    var task: String? = null,
-    val executedActions: List<String>,
-    val appliedListeners: List<String>,
-
-)

@@ -1,13 +1,10 @@
 package malibu.multiturn.framework
 
 import malibu.multiturn.framework.expression.ExpressionRoot
-import malibu.multiturn.model.BotScenario
-import malibu.multiturn.model.Intend
-import malibu.multiturn.model.Topic
-import malibu.multiturn.model.TopicState
+import malibu.multiturn.model.*
 import kotlin.reflect.KClass
 
-class IntendData(
+class RequestData(
     val multiTurnReq: MultiTurnReq,
     val behaviorRegistry: BehaviorRegistry,
     val botScenario: BotScenario,
@@ -22,7 +19,13 @@ class IntendData(
     var finishIntendArgumentLoad: Boolean = false
         internal set
 
-    internal lateinit var intend: Intend
+    internal lateinit var selectedIntend: Intend
+
+    internal lateinit var selectedTask: Task
+
+    internal lateinit var executedActions: List<Action>
+
+    internal lateinit var appliedTaskListeners: List<TaskListener>
 
     /**
      * 표현식에서 사용할 root object.
@@ -73,5 +76,25 @@ class IntendData(
         return PlaceholderResolver.resolve(rawValue) { expression ->
             evaluate(expression, String::class)?: ""
         }
+    }
+
+    fun createRequestTrace(): RequestTrace {
+        return RequestTrace(
+            multiTurnReq = multiTurnReq,
+            executedActions = if (::executedActions.isInitialized) {
+                executedActions.map { it.toString() }
+            } else {
+                emptyList()
+            },
+            appliedIntendListeners = if (::appliedTaskListeners.isInitialized) {
+                appliedTaskListeners.map { it.toString() }
+            } else {
+                emptyList()
+            }
+        )
+            .also { trace ->
+                trace.selectedIntend = if (::selectedIntend.isInitialized) selectedIntend.toString() else null
+                trace.selectedTask = if (::selectedTask.isInitialized) selectedTask.toString() else null
+            }
     }
 }

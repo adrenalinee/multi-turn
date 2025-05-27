@@ -1,7 +1,7 @@
 package malibu.multiturn.module.core.behavior
 
 import malibu.multiturn.framework.ActionBehavior
-import malibu.multiturn.framework.IntendData
+import malibu.multiturn.framework.RequestData
 import malibu.multiturn.framework.MultiTurnRes
 import malibu.multiturn.module.core.SpeakAction
 import malibu.multiturn.module.core.directive.SpeakDirective
@@ -14,7 +14,7 @@ class SpeakActionBehavior(
 
     override fun run(
         action: SpeakAction,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
         if (logger.isDebugEnabled) {
@@ -23,7 +23,7 @@ class SpeakActionBehavior(
 
         multiTurnRes.addDirective(SpeakDirective(
             sentences = action.sentences.map { sentence ->
-                intendData.resolvePlaceHolder(sentence)
+                requestData.resolvePlaceHolder(sentence)
             }
         ))
 

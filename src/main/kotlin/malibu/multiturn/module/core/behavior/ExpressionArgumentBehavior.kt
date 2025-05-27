@@ -1,7 +1,7 @@
 package malibu.multiturn.module.core.behavior
 
 import malibu.multiturn.framework.ArgumentBehavior
-import malibu.multiturn.framework.IntendData
+import malibu.multiturn.framework.RequestData
 import malibu.multiturn.module.core.ExpressionArgument
 import mu.KotlinLogging
 import reactor.core.publisher.Flux
@@ -15,13 +15,13 @@ class ExpressionArgumentBehavior(
 
     override fun retrieve(
         argument: ExpressionArgument,
-        intendData: IntendData
+        requestData: RequestData
     ): Mono<out Any> {
         if (logger.isDebugEnabled) {
             logger.debug { "start" }
         }
 
-        val result = intendData.evaluate(argument.expression, Any::class)
+        val result = requestData.evaluate(argument.expression, Any::class)
 
         return when (result) {
             is Mono<*> -> result

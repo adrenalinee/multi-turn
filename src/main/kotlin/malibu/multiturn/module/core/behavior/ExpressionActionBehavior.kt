@@ -1,7 +1,7 @@
 package malibu.multiturn.module.core.behavior
 
 import malibu.multiturn.framework.ActionBehavior
-import malibu.multiturn.framework.IntendData
+import malibu.multiturn.framework.RequestData
 import malibu.multiturn.framework.MultiTurnRes
 import malibu.multiturn.module.core.ExpressionAction
 import mu.KotlinLogging
@@ -14,7 +14,7 @@ class ExpressionActionBehavior(
 
     override fun run(
         action: ExpressionAction,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
         if (logger.isDebugEnabled) {
@@ -22,7 +22,7 @@ class ExpressionActionBehavior(
         }
 
         action.expressions.forEach { expression ->
-            intendData.evaluate(
+            requestData.evaluate(
                 expression = expression,
                 desiredResultType = Any::class
             )

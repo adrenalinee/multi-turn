@@ -84,21 +84,21 @@ abstract class MultiTurnModuleConfigurer<in M: MultiTurnModule> {
         )
     }
 
-    protected fun register(intendListener: IntendListener) {
+    protected fun register(taskListener: TaskListener) {
         behaviorFunctions.add(
             object : BehaviorFunc {
                 override fun register(behaviorRegistry: BehaviorRegistry) {
-                    behaviorRegistry.registerFirst(intendListener)
+                    behaviorRegistry.registerFirst(taskListener)
                 }
             }
         )
     }
 
-    protected fun registerLastOrder(intendListener: IntendListener) {
+    protected fun registerLastOrder(taskListener: TaskListener) {
         behaviorFunctions.add(
             object : BehaviorFunc {
                 override fun register(behaviorRegistry: BehaviorRegistry) {
-                    behaviorRegistry.registerLast(intendListener)
+                    behaviorRegistry.registerLast(taskListener)
                 }
             }
         )

@@ -34,7 +34,7 @@ class MultiTurnHandlerTest {
             conversationParams = mapOf("conversation-param" to "test"),
             instantParams = mapOf("instant-param" to "test"),
         )
-        val resultJson = handler.handle(req)
+        val resultJson = handler.handle(req, true)
             .block()
             .let { om.writerWithDefaultPrettyPrinter().writeValueAsString(it) }
 

@@ -10,7 +10,7 @@ class BehaviorRegistry(
 ) {
     private val actionBehaviors: MutableMap<String, ActionBehavior<out Action>> = mutableMapOf()
     private val argumentBehaviors: MutableMap<String, ArgumentBehavior<out Argument>> = mutableMapOf()
-    private val intentListeners: MutableList<IntendListener> = mutableListOf()
+    private val intentListeners: MutableList<TaskListener> = mutableListOf()
 
     /**
      * 표현식에서 사용할 root object.
@@ -33,15 +33,15 @@ class BehaviorRegistry(
         return argumentBehaviors.get(type)
     }
 
-    fun getIntentListeners(): List<IntendListener> {
+    fun getIntentListeners(): List<TaskListener> {
         return intentListeners.toList()
     }
 
-    fun registerLast(intendListener: IntendListener) {
-        intentListeners.add(intendListener)
+    fun registerLast(taskListener: TaskListener) {
+        intentListeners.add(taskListener)
     }
 
-    fun registerFirst(intendListener: IntendListener) {
-        intentListeners.add(0, intendListener)
+    fun registerFirst(taskListener: TaskListener) {
+        intentListeners.add(0, taskListener)
     }
 }

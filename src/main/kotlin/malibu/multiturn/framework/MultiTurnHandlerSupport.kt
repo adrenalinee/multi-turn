@@ -19,16 +19,12 @@ class MultiTurnHandlerSupport(
 
     internal fun createMultiTurnRes(
         multiTurnReq: MultiTurnReq,
-//        topic: Topic,
-//        topicState: TopicState,
     ): MultiTurnRes {
         return MultiTurnRes(
             requestId = multiTurnReq.requestId,
             conversationId = multiTurnReq.conversationId,
             intent = multiTurnReq.intent,
             botScenario = botScenario.name,
-//            topic = topic.name,
-//            topicState = topicState.name,
             scenarioVersion = botScenario.scenarioVersion,
             modelVersion = botScenario.modelVersion,
         ).also { multiTurnRes ->
@@ -36,8 +32,11 @@ class MultiTurnHandlerSupport(
         }
     }
 
+    /**
+     *
+     */
     internal fun postTasksRun(
-        intendData: IntendData,
+        requestData: RequestData,
         selectedTask: Task,
         multiTurnRes: MultiTurnRes,
     ) {
@@ -47,7 +46,7 @@ class MultiTurnHandlerSupport(
             selectedTask.nextTopic
                 ?.also { nextTopicName -> multiTurnRes.nextTopic = nextTopicName }
                 ?: run {
-                    multiTurnRes.nextTopic = intendData.topic.name
+                    multiTurnRes.nextTopic = requestData.topic.name
                 }
         }
 
@@ -57,7 +56,7 @@ class MultiTurnHandlerSupport(
             selectedTask.nextTopicState
                 ?.also { nextTopicStateName -> multiTurnRes.nextTopicState = nextTopicStateName }
                 ?: run {
-                    multiTurnRes.nextTopicState = intendData.topicState.name
+                    multiTurnRes.nextTopicState = requestData.topicState.name
                 }
         }
     }
@@ -86,7 +85,7 @@ class MultiTurnHandlerSupport(
     /**
      *
      */
-    internal fun findIntendByTriggerExpression(intends: List<Intend>, intendData: IntendData): Mono<Intend> {
+    internal fun findIntendByTriggerExpression(intends: List<Intend>, requestData: RequestData): Mono<Intend> {
         return intends
             .toFlux()
             .filterWhen { intend ->
@@ -95,11 +94,11 @@ class MultiTurnHandlerSupport(
                 } else {
                     Mono.defer {
                         if (intend.triggerRequireArguments == true) { //필요할 경우 미리 argument 로딩
-                            loadArgument(intend.getIntendArguments(), intendData)
+                            loadArgument(intend.getIntendArguments(), requestData)
                         } else {
                             Mono.empty()
                         }
-                    }.thenReturn(intendData.evaluate(intend.triggerExpression, Boolean::class) ?: false)
+                    }.thenReturn(requestData.evaluate(intend.triggerExpression, Boolean::class) ?: false)
                 }
             }
             .singleOrEmpty() //TODO 여러개 찾아질 경우에???
@@ -108,7 +107,7 @@ class MultiTurnHandlerSupport(
     /**
      *
      */
-    internal fun findTask(selectedIntend: Intend, intendData: IntendData): Mono<Task> {
+    internal fun findTask(selectedIntend: Intend, requestData: RequestData): Mono<Task> {
         if (selectedIntend.getTasks().isEmpty()) {
             return Mono.error(RuntimeException("task 가 등록되지 않았습니다. selectedIntend: $selectedIntend"))
         }
@@ -122,11 +121,11 @@ class MultiTurnHandlerSupport(
             .filterWhen { task ->
                 Mono.defer {
                     if (task.triggerRequireArguments == true) { //필요할 경우 미리 argument 로딩
-                        loadArgument(task.getTaskArguments(), intendData)
+                        loadArgument(task.getTaskArguments(), requestData)
                     } else {
                         Mono.empty()
                     }
-                }.thenReturn(intendData.evaluate(task.triggerExpression, Boolean::class) ?: false)
+                }.thenReturn(requestData.evaluate(task.triggerExpression, Boolean::class) ?: false)
             }
             .singleOrEmpty() //TODO 여러개 찾아질 경우에???
     }
@@ -137,11 +136,11 @@ class MultiTurnHandlerSupport(
     internal fun executeActions(
         multiTurnRes: MultiTurnRes,
         selectedTask: Task,
-        intendData: IntendData,
+        requestData: RequestData,
     ): Mono<List<Action>> {
         val executableActions = selectedTask.getActions().filter { action ->
             val enabled = action.enabledPredicate?.let { enabledPredicate ->
-                intendData.evaluate(enabledPredicate, Boolean::class)
+                requestData.evaluate(enabledPredicate, Boolean::class)
             } ?: true
 
             enabled.also {
@@ -158,7 +157,7 @@ class MultiTurnHandlerSupport(
                 val actionBehavior = behaviorRegistry.findActionBehaviorOrNull(action.type)
                     ?: return@concatMap Mono.error(ActionBehaviorNotFoundException(action))
 
-                actionBehavior.behave(action, intendData, multiTurnRes)
+                actionBehavior.behave(action, requestData, multiTurnRes)
                     .onErrorMap { ex -> ActionBehaviorRunException(actionBehavior, ex) }
             }
             .then(executableActions.toMono())
@@ -169,9 +168,9 @@ class MultiTurnHandlerSupport(
      */
     internal fun loadArgument(
         arguments: List<NameValue<Argument>>,
-        intendData: IntendData,
+        requestData: RequestData,
         ): Mono<Void> {
-        if (intendData.finishIntendArgumentLoad) { //이미 로딩되었다면 그냥 넘어감
+        if (requestData.finishIntendArgumentLoad) { //이미 로딩되었다면 그냥 넘어감
             return Mono.empty()
         }
 
@@ -180,7 +179,7 @@ class MultiTurnHandlerSupport(
                 val argumentBehavior = behaviorRegistry.findArgumentBehaviorOrNull(argument.type)
                     ?: return@concatMap Mono.error(ArgumentBehaviorNotFoundException(argument))
 
-                argumentBehavior.behave(argument, intendData)
+                argumentBehavior.behave(argument, requestData)
                     .map { argumentValue -> argumentName to argumentValue }
                     .switchIfEmpty {
                         if (argument.required == true) {
@@ -190,8 +189,8 @@ class MultiTurnHandlerSupport(
                         }
                     }
             }
-            .doOnNext { (argumentName, argumentValue) -> intendData.putArgument(argumentName, argumentValue)}
-            .doOnComplete { intendData.finishIntendArgumentLoad = true }
+            .doOnNext { (argumentName, argumentValue) -> requestData.putArgument(argumentName, argumentValue)}
+            .doOnComplete { requestData.finishIntendArgumentLoad = true }
             .then()
     }
 }

@@ -1,7 +1,7 @@
 package malibu.multiturn.module.core.behavior
 
 import malibu.multiturn.framework.ActionBehavior
-import malibu.multiturn.framework.IntendData
+import malibu.multiturn.framework.RequestData
 import malibu.multiturn.framework.MultiTurnRes
 import malibu.multiturn.module.core.AddConversationParamAction
 import mu.KotlinLogging
@@ -14,7 +14,7 @@ class AddConversationParamActionBehavior(
 
     override fun run(
         action: AddConversationParamAction,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
         if (logger.isDebugEnabled) {
@@ -24,7 +24,7 @@ class AddConversationParamActionBehavior(
         action.params.forEach { param ->
             multiTurnRes.setConversationParam(
                 name = param.name,
-                value = intendData.resolvePlaceHolder(param.value)
+                value = requestData.resolvePlaceHolder(param.value)
             )
         }
 

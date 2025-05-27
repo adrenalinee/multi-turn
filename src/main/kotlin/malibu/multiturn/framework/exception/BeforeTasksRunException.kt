@@ -1,11 +1,11 @@
 package malibu.multiturn.framework.exception
 
-import malibu.multiturn.framework.IntendListener
+import malibu.multiturn.framework.TaskListener
 
 class BeforeTasksRunException(
-    intendListener: IntendListener,
+    taskListener: TaskListener,
     cause: Throwable
 ): MultiTurnException(
-    message = "intendListener.beforeTasksRun() 실행중 에러 발생. intendListener: $intendListener",
+    message = "intendListener.beforeTasksRun() 실행중 에러 발생. intendListener: $taskListener",
     cause = cause
 )

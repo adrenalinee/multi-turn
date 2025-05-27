@@ -6,11 +6,11 @@ import reactor.core.publisher.Mono
 abstract class ActionBehavior<T: Action> {
     fun behave(
         action: Action,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void> {
         @Suppress("UNCHECKED_CAST")
-        return run(action as T, intendData, multiTurnRes)
+        return run(action as T, requestData, multiTurnRes)
     }
 
     /**
@@ -18,7 +18,7 @@ abstract class ActionBehavior<T: Action> {
      */
     protected abstract fun run(
         action: T,
-        intendData: IntendData,
+        requestData: RequestData,
         multiTurnRes: MultiTurnRes
     ): Mono<Void>
 }
